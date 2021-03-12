@@ -1,7 +1,8 @@
 #!/bin/bash
 if [ $# -eq 0 ]
   then
-    echo -e "No arguments found. Please indicate the filename. Usage: $(basename "$0") <filename>\n"
+    echo -e "No arguments found. Please indicate the filename. Usage: $(basename "$0") <filename> (without quotes, just the
+    path)\n"
     exit 1
 fi
 
@@ -15,19 +16,29 @@ mkdir $destination/gifs
 if [ ! -d $destination/Recordings ]; then
     mkdir -p $destination/Recordings;
 fi
-
+if [ ! -f $1 ]; then
+    echo "Not a valid filename. Check file exists and uses the right extension"
+    exit 1
+fi
 echo -e "\nMaking GIF..."
-f=$1
-name=$(basename $f "${f##*.}")
 
+f=$1
 echo $f > $destination/log
+name=${f// /-}
+name=$(basename $name ".${name##*.}")
+
+echo "ffmpeg" >$destination/log
 ffmpeg -i $f -r 10 $destination/pngs/$name%04d.png 2>$destination/log
-sips -s format gif $destination/pngs/$name*.png --out $destination/gifs  > /dev/null 2>$destination/log
+
+echo "sips">$destination/log
+sips -s format gif $destination/pngs/$name*.png --out $destination/gifs >/dev/null 2>$destination/log
+
 gifsicle --optimize=3 --resize-width=320 --delay=10 --loopcount $destination/gifs/$name*.gif > $destination/$name.gif
+
 echo -e "\nFinished making GIF!"
 
 #Uncomment if you would like your recordings to be moved into this folder instead
-mv $f $destination/Recordings
+mv "$f" $destination/Recordings
 
 rm -rf $destination/gifs
 rm -rf $destination/pngs
