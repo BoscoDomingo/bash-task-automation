@@ -1,4 +1,5 @@
 #!/bin/bash
+# Initial checks
 if [ $# -eq 0 ]
   then
     echo -e "No arguments found. Please indicate the filename. Usage: $(basename "$0") <filename> (without quotes, just the
@@ -12,7 +13,12 @@ if [ $# -gt 1 ];  then
     exit 1
 fi
 
-#GIF
+if [ ! -f "$1" ]; then
+    echo "$1 is not a valid filename. Check file exists, has no whitespace and uses the right extension"
+    exit 1
+fi
+
+# File names and paths
 destination=~/Desktop/PR_GIFs
 rm -rf $destination/pngs
 mkdir $destination/pngs
@@ -23,19 +29,14 @@ if [ ! -d $destination/Recordings ]; then
     mkdir -p $destination/Recordings;
 fi
 
-if [ ! -f "$1" ]; then
-    echo "$1 is not a valid filename. Check file exists, has no whitespace and uses the right extension"
-    exit 1
-fi
-echo -e "\nMaking GIF..."
-
 f="$1"
 echo $f > $destination/log
-name=${f//\\/}
-name=${name// /-} #remove escaped whitespace
-name=$(basename $name ".${name##*.}") #remove extension
-echo -e "\nOutput name: $name"
+name=${f//\\/} # remove escape characters
+name=${name// /_} # substitute whitespace
+name=$(basename $name ".${name##*.}") # remove extension
 
+# GIF
+echo "Making GIF..."
 echo "ffmpeg" > $destination/log
 ffmpeg -i "$f" -r 10 $destination/pngs/$name%04d.png 2>$destination/log
 
@@ -44,9 +45,9 @@ sips -s format gif $destination/pngs/$name*.png --out $destination/gifs >/dev/nu
 
 gifsicle --optimize=3 --resize-width=320 --delay=10 --loopcount $destination/gifs/$name*.gif > $destination/$name.gif
 
-echo -e "\nFinished making GIF!"
+echo -e "\nFinished making GIF. Find it at:\n$destination/$name.gif"
 
-#Uncomment if you would like your recordings to be moved into this folder instead
+# Comment if you would like your recordings to not be moved
 mv "$f" $destination/Recordings
 
 rm -rf $destination/gifs
