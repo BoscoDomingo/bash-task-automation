@@ -6,6 +6,12 @@ if [ $# -eq 0 ]
     exit 1
 fi
 
+if [ $# -gt 1 ];  then
+    echo -e "Too many arguments. Usage: $(basename "$0") <filename> (without quotes; remove or escape whitespace if
+    present)\n"
+    exit 1
+fi
+
 #GIF
 destination=~/Desktop/PR_GIFs
 rm -rf $destination/pngs
@@ -16,19 +22,22 @@ mkdir $destination/gifs
 if [ ! -d $destination/Recordings ]; then
     mkdir -p $destination/Recordings;
 fi
-if [ ! -f $1 ]; then
-    echo "Not a valid filename. Check file exists and uses the right extension"
+
+if [ ! -f "$1" ]; then
+    echo "$1 is not a valid filename. Check file exists, has no whitespace and uses the right extension"
     exit 1
 fi
 echo -e "\nMaking GIF..."
 
-f=$1
+f="$1"
 echo $f > $destination/log
-name=${f// /-}
-name=$(basename $name ".${name##*.}")
+name=${f//\\/}
+name=${name// /-} #remove escaped whitespace
+name=$(basename $name ".${name##*.}") #remove extension
+echo -e "\nOutput name: $name"
 
-echo "ffmpeg" >$destination/log
-ffmpeg -i $f -r 10 $destination/pngs/$name%04d.png 2>$destination/log
+echo "ffmpeg" > $destination/log
+ffmpeg -i "$f" -r 10 $destination/pngs/$name%04d.png 2>$destination/log
 
 echo "sips">$destination/log
 sips -s format gif $destination/pngs/$name*.png --out $destination/gifs >/dev/null 2>$destination/log
