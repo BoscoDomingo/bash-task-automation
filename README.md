@@ -14,9 +14,10 @@ Also used [this website](https://iridakos.com/programming/2018/03/01/bash-progra
 
 1. `sudo install ./make_GIF /usr/local/bin/make_GIF` (make sure `usr/local/bin` is added to the PATH)
 
-2. `nano make_GIF-completion.bash`
+2. `nano make_GIF-completion.bash` (or use the one provided in this repo)
 
 3. ```
     #/usr/bin/env bash
     complete -A directory make_GIF
     ```
+4. `source ./make_GIF-completion.bash`
