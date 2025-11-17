@@ -1,6 +1,6 @@
 # bash-task-automation
 
-Scripts I wrote to automate certain tasks on a *NIX system. The files/usage are:
+Some scripts I wrote to automate day-to-day tasks. The files/usage are:
 
 ## Recording
 
